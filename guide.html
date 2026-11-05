@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Step-by-step interactive guide: customize what Tihoka asks AI providers and how answers look — JSON request, HTML display, CSS styling.">
+<title>Customize your AI answers — Tihoka Guide</title>
+<style>
+  :root {
+    --bg: #141416;
+    --bg-raised: #1d1d21;
+    --card: #232327;
+    --field: #2b2b30;
+    --field2: #313136;
+    --text: #ececef;
+    --text-2: #a8a8b0;
+    --text-3: #74747d;
+    --gold: #f2b02e;
+    --gold-2: #e09a12;
+    --gold-soft: rgba(242, 176, 46, 0.12);
+    --err: #e06c75;
+    --ok: #8fce6f;
+    --divider: #333338;
+    --mono: "Cascadia Code", Consolas, "Courier New", monospace;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--gold); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: var(--mono); font-size: 0.88em; color: var(--gold); }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(20,20,22,.85); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--divider);
+  }
+  .nav-in { display: flex; align-items: center; gap: 16px; height: 60px; }
+  .logo { font-weight: 700; font-size: 18px; color: var(--text); }
+  .logo em { color: var(--gold); font-style: normal; }
+  .logo:hover { text-decoration: none; }
+  .nav-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  .nav-links a { padding: 7px 14px; border-radius: 999px; color: var(--text-2); font-size: 14px; }
+  .nav-links a:hover { color: var(--text); background: var(--field); text-decoration: none; }
+  .langTog {
+    border: 1px solid var(--divider); border-radius: 999px; overflow: hidden;
+    display: inline-flex; font-size: 12.5px; font-weight: 600;
+  }
+  .langTog button {
+    border: none; background: transparent; color: var(--text-3);
+    padding: 6px 12px; font: inherit; cursor: pointer;
+  }
+  .langTog button.on { background: var(--gold); color: #20180a; }
+
+  .hero { padding: 72px 0 48px; text-align: center; }
+  .hero .kicker {
+    display: inline-block; padding: 5px 14px; border-radius: 999px;
+    background: var(--gold-soft); color: var(--gold);
+    font-size: 13px; font-weight: 600; letter-spacing: .04em;
+  }
+  .hero h1 { margin: 18px 0 14px; font-size: clamp(30px,4.6vw,46px); letter-spacing: -0.02em; line-height: 1.15; }
+  .hero h1 em { color: var(--gold); font-style: normal; }
+  .hero p { max-width: 640px; margin: 0 auto; color: var(--text-2); font-size: 17px; }
+
+  section { padding: 56px 0; }
+  .sec-title { margin: 0 0 8px; font-size: 26px; letter-spacing: -0.01em; }
+  .sec-sub { margin: 0 0 32px; color: var(--text-2); max-width: 660px; }
+
+  /* steps */
+  .steps { counter-reset: s; max-width: 720px; }
+  .step { position: relative; padding: 0 0 30px 58px; }
+  .step::before {
+    counter-increment: s; content: counter(s);
+    position: absolute; left: 0; top: 0;
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--field); color: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; border: 1px solid var(--divider);
+  }
+  .step:not(:last-child)::after {
+    content: ''; position: absolute; left: 18px; top: 42px; bottom: 4px;
+    width: 2px; background: var(--divider);
+  }
+  .step h3 { margin: 6px 0 6px; font-size: 16.5px; }
+  .step p { margin: 0; color: var(--text-2); font-size: 14.5px; }
+
+  /* contract cards */
+  .contract { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .ct {
+    background: var(--card); border: 1px solid var(--divider);
+    border-radius: 14px; padding: 18px 18px;
+  }
+  .ct code {
+    display: inline-block; padding: 2px 8px; border-radius: 6px;
+    background: var(--field2); font-size: 13px; margin-bottom: 8px;
+  }
+  .ct p { margin: 0; color: var(--text-2); font-size: 13.5px; }
+  .vars {
+    margin-top: 16px; background: var(--card); border: 1px solid var(--divider);
+    border-radius: 14px; padding: 18px;
+  }
+  .vars .vrow { display: flex; gap: 14px; padding: 7px 0; align-items: baseline; }
+  .vars .vrow + .vrow { border-top: 1px solid var(--divider); }
+  .vars code { min-width: 130px; font-size: 13px; }
+  .vars span { color: var(--text-2); font-size: 13.5px; }
+
+  /* AI writer */
+  .aiCard {
+    background: var(--card); border: 1px solid var(--divider);
+    border-radius: var(--radius); padding: 24px;
+  }
+  .aiCard ol { margin: 0 0 18px; padding-left: 22px; color: var(--text-2); font-size: 14.5px; }
+  .aiCard li { margin-bottom: 4px; }
+  .metaWrap { position: relative; }
+  .metaPre {
+    margin: 0; padding: 16px; border-radius: 10px; background: var(--field);
+    font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--text-2);
+    white-space: pre-wrap; word-break: break-word; max-height: 260px; overflow-y: auto;
+  }
+  .copyBtn {
+    position: absolute; top: 10px; right: 10px;
+    border: 1px solid var(--divider); border-radius: 999px;
+    background: var(--bg-raised); color: var(--text-2);
+    padding: 6px 14px; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  }
+  .copyBtn:hover { color: var(--text); border-color: var(--gold); }
+  .copyBtn.done { color: var(--ok); border-color: var(--ok); }
+
+  /* ---- playground ---- */
+  .play {
+    background: var(--card); border: 1px solid var(--divider);
+    border-radius: var(--radius); padding: 18px;
+  }
+  .featTabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .featTab {
+    display: inline-flex; align-items: center; gap: 6px;
+    min-height: 32px; padding: 4px 13px;
+    border: none; border-radius: 999px; background: transparent;
+    color: var(--text-2); font: inherit; font-size: 13.5px; cursor: pointer;
+  }
+  .featTab:hover { color: var(--text); }
+  .featTab.on { background: var(--field); color: var(--text); font-weight: 600; }
+  .featTab .dot { font-size: 8px; color: var(--gold); }
+
+  .cols { display: grid; gap: 18px; }
+  @media (min-width: 960px) { .cols { grid-template-columns: 7fr 5fr; align-items: start; } }
+
+  .edTabs { display: flex; gap: 2px; }
+  .edTab {
+    padding: 7px 16px; border: none; border-radius: 8px 8px 0 0;
+    background: transparent; color: var(--text-3);
+    font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer;
+  }
+  .edTab:hover { color: var(--text); }
+  .edTab.on { background: var(--field); color: var(--gold); }
+  .taWrap { border-radius: 0 8px 8px 8px; background: var(--field); }
+  .taWrap:focus-within { box-shadow: inset 0 0 0 2px var(--gold); }
+  .taWrap:focus-within textarea { max-height: none !important; }
+  textarea.ed {
+    display: block; width: 100%; min-height: 280px;
+    padding: 12px 14px; border: none; background: transparent;
+    color: var(--text); font-family: var(--mono); font-size: 12px;
+    line-height: 1.65; resize: vertical; overflow-y: auto; max-height: 280px;
+  }
+  textarea.ed:focus { outline: none; }
+  .edStatus { margin: 8px 0 0; font-size: 12px; min-height: 18px; }
+  .edStatus.err { color: var(--err); }
+  .edStatus.ok { color: var(--ok); }
+  .slots { margin-top: 4px; font-size: 11.5px; color: var(--text-3); }
+  .slots code { padding: 0 5px; border-radius: 4px; background: var(--field2); font-size: 10.5px; }
+
+  details.payload { margin-top: 10px; }
+  details.payload summary { font-size: 12px; color: var(--text-2); cursor: pointer; list-style: none; }
+  details.payload summary::before { content: '▸ '; }
+  details.payload[open] summary::before { content: '▾ '; }
+  details.payload pre {
+    margin: 6px 0 0; padding: 10px 12px; border-radius: 8px;
+    background: var(--field); color: var(--text-2);
+    font-family: var(--mono); font-size: 11px; line-height: 1.6;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .playFoot { display: flex; justify-content: flex-end; margin-top: 12px; }
+  .btnGhost {
+    min-height: 30px; padding: 4px 14px; border: none; border-radius: 999px;
+    background: transparent; color: var(--text-2); font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .btnGhost:hover { color: var(--text); background: var(--field); }
+
+  .prevLabel { font-size: 12px; color: var(--text-3); margin: 0 0 8px 4px; }
+  .popup {
+    background: #1f1f23; border-radius: 18px; padding: 16px 18px;
+    border: 1px solid var(--divider);
+    box-shadow: 0 8px 30px rgba(0,0,0,.45);
+    transform: translateZ(0); overflow: hidden;
+  }
+  .popHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .popSrc { color: var(--text-2); font-size: 12px; }
+  #preview { min-height: 60px; font-size: 14px; }
+  .popFoot { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--divider); font-size: 11px; color: var(--text-3); }
+  .popFoot b { color: var(--gold); font-weight: 600; }
+
+  .ck { display: flex; gap: 10px; align-items: flex-start; padding: 6px 4px; border-radius: 8px; cursor: pointer; }
+  .ck:hover { background: rgba(255,255,255,.04); }
+  .ck .box {
+    flex: 0 0 auto; width: 15px; height: 15px; margin-top: 3px;
+    border-radius: 4px; border: 1.5px solid var(--text-3);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: transparent; font-size: 10px;
+  }
+  .ck.on .box { border-color: var(--gold); color: var(--gold); }
+  .ckBody { min-width: 0; flex: 1; }
+
+  .note {
+    margin-top: 20px; padding: 14px 18px; border-radius: 12px;
+    background: var(--gold-soft); color: var(--text-2); font-size: 14px;
+    border: 1px solid rgba(242,176,46,.25);
+  }
+  footer { border-top: 1px solid var(--divider); padding: 32px 0 44px; color: var(--text-3); font-size: 14px; }
+  .foot-in { display: flex; flex-wrap: wrap; gap: 12px 26px; }
+  .foot-in .spacer { margin-left: auto; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="logo" href="./">Tihoka<em>.</em></a>
+    <div class="nav-right">
+      <div class="nav-links"><a href="./">Home</a></div>
+      <div class="langTog">
+        <button id="langEn" type="button">EN</button>
+        <button id="langVi" type="button">VI</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker" data-i18n="kicker"></span>
+    <h1 data-i18n-html="title"></h1>
+    <p data-i18n="sub"></p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec-title" data-i18n="stepsTitle"></h2>
+    <p class="sec-sub" data-i18n="stepsSub"></p>
+    <div class="steps" id="steps"></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec-title" data-i18n="contractTitle"></h2>
+    <p class="sec-sub" data-i18n="contractSub"></p>
+    <div class="contract" id="contract"></div>
+    <div class="vars">
+      <div id="varRows"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec-title" data-i18n="aiTitle"></h2>
+    <p class="sec-sub" data-i18n="aiSub"></p>
+    <div class="aiCard">
+      <ol id="aiSteps"></ol>
+      <div class="metaWrap">
+        <pre class="metaPre" id="metaPrompt"></pre>
+        <button class="copyBtn" id="copyBtn" type="button"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec-title" data-i18n="playTitle"></h2>
+    <p class="sec-sub" data-i18n="playSub"></p>
+    <div class="play">
+      <div class="featTabs" id="featTabs"></div>
+      <div class="cols">
+        <div>
+          <div class="edTabs" id="edTabs"></div>
+          <div class="taWrap"><textarea id="ed" class="ed" spellcheck="false"></textarea></div>
+          <div class="edStatus" id="edStatus"></div>
+          <div class="slots" id="slots"></div>
+          <details class="payload">
+            <summary data-i18n="payloadLabel"></summary>
+            <pre id="payloadBody"></pre>
+          </details>
+          <div class="playFoot">
+            <button class="btnGhost" id="btnReset" type="button" data-i18n="reset"></button>
+          </div>
+        </div>
+        <div>
+          <div class="prevLabel" data-i18n="prevLabel"></div>
+          <div class="popup">
+            <div class="popHead"><span class="popSrc">DeepSeek</span></div>
+            <div id="preview"></div>
+            <div class="popFoot" id="popFoot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note" data-i18n="safeNote"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <span>© Tihoka</span>
+    <a href="mailto:tihoka.official@gmail.com">tihoka.official@gmail.com</a>
+    <span class="spacer"></span>
+    <a href="./">Home</a>
+    <a href="privacy.html">Privacy</a>
+  </div>
+</footer>
+
+<script>
+// ================= i18n =================
+const META_PROMPT = `You are customizing an AI prompt for a dictionary browser extension. Reply with three labeled code blocks: JSON, HTML, CSS.
+
+JSON — the request template, one JSON object:
+- "instructions": English rules for the AI.
+- "input": data for the AI. Values may use {{word}}, {{sentence}}, {{lang_target}}, {{lang_native}}, {{lang_answer}} — a bare {{var}} becomes the real value; inside a JSON string it inserts text. No other {{...}} names.
+- "output": the answer schema — EITHER exactly one "string" leaf whose key name is your choice (e.g. "translation": "string"), OR one array of objects with "text", "meaning", "explanation" (for sentence breakdown). The extension parses the AI reply by this schema.
+
+HTML — how the answer looks (optional):
+- {{name}} inserts request variables or answer fields (e.g. {{translation}}, {{word}}, or a chunk's {{text}}).
+- data-each="<array key>" repeats that element per array item.
+- data-check makes an element a checkbox — ticked parts go into flashcards.
+- No scripts, forms, or input elements.
+
+CSS — styles for that HTML (optional, may be empty).
+
+The feature to customize: <WORD EXPLAIN | SENTENCE BREAKDOWN | SENTENCE TRANSLATE>
+What I want: <describe it in your own words>`;
+
+const I18N = {
+  en: {
+    kicker: 'Guide · AI Customization',
+    title: 'Make AI answers <em>yours</em>',
+    sub: 'Every AI answer in the dictionary popup runs on a template you own. Five steps, no coding required — and a live playground at the bottom to practice safely.',
+    stepsTitle: 'Five steps to a custom prompt',
+    stepsSub: 'Everything happens in Settings → AI assistance → Custom AI prompts.',
+    steps: [
+      ['Open the prompt editor', 'In the extension, go to Settings → AI assistance → Custom AI prompts and pick a feature tab: Word explain, Sentence breakdown, or Sentence translate.'],
+      ['Edit the JSON request', 'The JSON tab holds the whole request: "instructions" tells the AI what to do, "input" carries the data, "output" declares the answer shape. Rename output keys freely — that schema is how Tihoka parses the reply.'],
+      ['Style the answer (optional)', 'HTML tab defines the layout with {{slot}} placeholders, data-each loops, and data-check checkboxes. CSS tab styles it. Leave both empty to keep the default look.'],
+      ['Check validation & preview', 'Broken JSON or an invalid output schema shows a red error before you can save. The live preview renders your template with sample data — tick the checkboxes to see what flows into cards.'],
+      ['Save and test in the popup', 'Click Save, then look up a word on a streaming site. The AI answers in your format. "Reset to default" restores the stock template anytime.'],
+    ],
+    contractTitle: 'The four names Tihoka owns',
+    contractSub: 'You control everything else — instructions, input layout, key names, markup, styling. These four are the contract.',
+    contract: [
+      ['"output"', 'Inside the JSON: declares what the AI must return — and how Tihoka parses it. One "string" leaf for text answers (any key name, any nesting), or one array of objects for sentence breakdown.'],
+      ['{{slot}}', 'In HTML: inserts request variables or answer fields — {{word}}, {{translation}}, {{text}}… Whatever your output schema names, that slot exists.'],
+      ['data-each="key"', 'In HTML: repeats that element once per array item — one row per breakdown chunk.'],
+      ['data-check', 'In HTML: makes the element a checkbox. Ticked parts are what can be appended to flashcards. No data-check → no card input.'],
+    ],
+    varsTitle: 'Request variables',
+    vars: [
+      ['{{word}}', 'The word being looked up'],
+      ['{{sentence}}', 'The sentence containing it'],
+      ['{{lang_target}}', 'The language being learned'],
+      ['{{lang_native}}', 'Your interface language'],
+      ['{{lang_answer}}', 'Resolved answer language (native or target, per your AI tab choice)'],
+    ],
+    aiTitle: 'Or let an AI write it for you',
+    aiSub: 'Copy this meta-prompt, paste it into ChatGPT / Gemini / Claude with your request, and paste the three code blocks back into the JSON / HTML / CSS tabs.',
+    aiSteps: [
+      'Copy the prompt below.',
+      'Paste it into your AI chat and add what you want, e.g. "sentence breakdown, explain chunks in Vietnamese, show romaji under each chunk".',
+      'Copy the JSON / HTML / CSS blocks it replies with into the matching editor tabs.',
+    ],
+    copy: 'Copy prompt',
+    copied: '✓ Copied',
+    playTitle: 'Practice playground',
+    playSub: 'The real editor, running on sample data. Break things here — nothing saves, nothing sends.',
+    features: { wordExplain: 'Word explain', sentenceBreakdown: 'Sentence breakdown', sentenceTranslate: 'Sentence translate' },
+    payloadLabel: 'Filled request sent to the AI',
+    reset: 'Reset to default',
+    prevLabel: 'Live preview — dictionary popup with sample data',
+    safeNote: 'This sandbox never saves or calls an AI. When you like a result, copy the three tabs into Settings → Custom AI prompts in the extension.',
+    parseChunks: (k, n) => `Parse: output.${k} → ${n} chunk objects {text, meaning, explanation}`,
+    parseText: (p, v) => `Parse: output.${p} → "${v}"`,
+    errJson: (m) => 'Invalid JSON — ' + m,
+    slotLabel: 'Display slots: ',
+    footCheck: (n, t) => `<b>${n}/${t}</b> checked — ticked items can go into flashcards (data-check in your template)`,
+    footNone: 'No <code>data-check</code> → nothing to tick, nothing to append',
+    prevWait: '— preview waits for a valid request —',
+    prevErr: 'Display render error — ',
+    errOutObj: '`output` must be an object — e.g. {"translation": "string"}',
+    errField: (k, f) => `items in "${k}[]" are missing "${f}" (required: text, meaning, explanation)`,
+    errNoLeaf: '`output` needs exactly one "string" leaf — where the AI puts the answer',
+    errManyLeaf: (n, l) => `\`output\` has ${n} "string" leaves (${l}) — keep only one`,
+  },
+  vi: {
+    kicker: 'Hướng dẫn · Tùy chỉnh AI',
+    title: 'Câu trả lời AI, <em>luật của bạn</em>',
+    sub: 'Mọi câu trả lời AI trong popup dictionary đều chạy trên template do bạn sở hữu. Năm bước, không cần biết code — có sân tập trực quan ở cuối trang.',
+    stepsTitle: 'Năm bước tùy chỉnh prompt',
+    stepsSub: 'Tất cả nằm trong Cài đặt → Trợ giúp AI → Custom AI prompts.',
+    steps: [
+      ['Mở trình chỉnh sửa prompt', 'Trong extension: Cài đặt → Trợ giúp AI → Custom AI prompts, chọn tab tính năng: Giải thích từ, Phân tích câu, hoặc Dịch câu.'],
+      ['Sửa request JSON', 'Tab JSON chứa toàn bộ request: "instructions" nói AI phải làm gì, "input" chứa dữ liệu, "output" khai báo hình dạng câu trả lời. Đổi tên key trong output tự do — schema đó chính là cách Tihoka parse kết quả.'],
+      ['Chỉnh giao diện trả lời (tùy chọn)', 'Tab HTML định nghĩa layout bằng slot {{...}}, vòng lặp data-each và checkbox data-check. Tab CSS chỉnh màu sắc, cỡ chữ. Để trống cả hai = giao diện mặc định.'],
+      ['Kiểm tra lỗi & xem trước', 'JSON hỏng hoặc output schema sai sẽ báo đỏ trước khi lưu được. Preview render template với dữ liệu mẫu — tick thử checkbox để thấy phần nào vào thẻ.'],
+      ['Lưu và thử trong popup', 'Bấm Lưu, rồi tra một từ trên trang xem phim. AI trả lời theo format của bạn. "Về mặc định" khôi phục mẫu gốc bất cứ lúc nào.'],
+    ],
+    contractTitle: 'Bốn cái tên hệ thống giữ',
+    contractSub: 'Mọi thứ khác là của bạn — instructions, layout input, tên key, markup, style. Bốn tên này là hợp đồng.',
+    contract: [
+      ['"output"', 'Trong JSON: khai báo AI phải trả gì — và Tihoka parse theo đó. Đúng một leaf "string" cho câu trả lời dạng text (tên key tự do), hoặc một array object cho phân tích câu.'],
+      ['{{slot}}', 'Trong HTML: chèn biến request hoặc field của câu trả lời — {{word}}, {{translation}}, {{text}}… Schema output đặt tên gì, slot đó tồn tại.'],
+      ['data-each="key"', 'Trong HTML: lặp element đó cho mỗi item trong array — một dòng cho mỗi chunk phân tích.'],
+      ['data-check', 'Trong HTML: biến element thành checkbox. Phần được tick mới append được vào thẻ. Không data-check → không thêm vào thẻ được.'],
+    ],
+    varsTitle: 'Biến của request',
+    vars: [
+      ['{{word}}', 'Từ đang tra'],
+      ['{{sentence}}', 'Câu chứa từ đó'],
+      ['{{lang_target}}', 'Ngôn ngữ đang học'],
+      ['{{lang_native}}', 'Ngôn ngữ giao diện'],
+      ['{{lang_answer}}', 'Ngôn ngữ trả lời (native hoặc target, theo lựa chọn tab AI)'],
+    ],
+    aiTitle: 'Hoặc nhờ AI viết hộ',
+    aiSub: 'Copy meta-prompt này, dán vào ChatGPT / Gemini / Claude kèm yêu cầu của bạn, rồi dán ba khối code trả về vào đúng ba tab JSON / HTML / CSS.',
+    aiSteps: [
+      'Copy đoạn prompt bên dưới.',
+      'Dán vào khung chat AI và thêm yêu cầu, vd "phân tích câu, giải thích từng cụm bằng tiếng Việt, thêm romaji dưới mỗi cụm".',
+      'Copy ba khối JSON / HTML / CSS nó trả về vào đúng ba tab trong editor.',
+    ],
+    copy: 'Copy prompt',
+    copied: '✓ Đã copy',
+    playTitle: 'Sân tập trực quan',
+    playSub: 'Đúng editor thật, chạy trên dữ liệu mẫu. Cứ phá thoải mái — không lưu, không gửi đi đâu.',
+    features: { wordExplain: 'Giải thích từ', sentenceBreakdown: 'Phân tích câu', sentenceTranslate: 'Dịch câu' },
+    payloadLabel: 'Request gửi AI — sau khi điền biến',
+    reset: 'Về mặc định',
+    prevLabel: 'Xem trước — popup dictionary với dữ liệu mẫu',
+    safeNote: 'Sân tập này không lưu và không gọi AI. Ưng ý rồi thì copy ba tab sang Cài đặt → Custom AI prompts trong extension.',
+    parseChunks: (k, n) => `Parse: output.${k} → ${n} chunk {text, meaning, explanation}`,
+    parseText: (p, v) => `Parse: output.${p} → "${v}"`,
+    errJson: (m) => 'JSON không hợp lệ — ' + m,
+    slotLabel: 'Slot display: ',
+    footCheck: (n, t) => `<b>${n}/${t}</b> checkbox — tick mục nào append mục đó vào thẻ (data-check trong template)`,
+    footNone: 'Không có <code>data-check</code> → không check, không append được',
+    prevWait: '— preview chờ request hợp lệ —',
+    prevErr: 'Display render lỗi — ',
+    errOutObj: '`output` phải là object — vd {"translation": "string"}',
+    errField: (k, f) => `item trong "${k}[]" thiếu field "${f}" (bắt buộc: text, meaning, explanation)`,
+    errNoLeaf: '`output` cần đúng 1 field "string" — chỗ AI đặt câu trả lời',
+    errManyLeaf: (n, l) => `\`output\` có ${n} field "string" (${l}) — chỉ giữ 1`,
+  },
+};
+
+let lang = localStorage.getItem('tihoka-guide-lang')
+  || ((navigator.language || 'en').startsWith('vi') ? 'vi' : 'en');
+const T = () => I18N[lang];
+const el = (id) => document.getElementById(id);
+
+// ================= data (mirrors extension defaults) =================
+const SYSVARS = ['word', 'sentence', 'lang_target', 'lang_native', 'lang_answer'];
+const DEFAULTS = {
+  wordExplain: {
+    json: `{
+  "instructions": "You are a language API. Explain input.word as used in input.sentence. Keep it under 15 words. Answer in the language named by input.lang_native.",
+  "input": {
+    "word": {{word}},
+    "sentence": {{sentence}},
+    "lang_native": {{lang_native}},
+    "lang_target": {{lang_target}}
+  },
+  "output": { "explanation": "string" }
+}`,
+    html: `<div class="word">{{word}}</div>
+<p class="ans">{{explanation}}</p>`,
+    css: `.word { font-weight: 700; font-size: 15px; }
+.ans { margin: 6px 0 0; color: #cfcfd4; }`,
+    sample: { word: 'by heart', sentence: 'He knew the answer by heart.', lang_target: 'English', lang_native: 'Vietnamese', lang_answer: 'Vietnamese' },
+    resp: { explanation: 'học thuộc lòng, thuộc nằm lòng' },
+  },
+  sentenceBreakdown: {
+    json: `{
+  "instructions": "You are a language API that does sentence breakdown. Split input.sentence into small meaningful contiguous chunks. Explain in input.lang_native.",
+  "input": {
+    "word": {{word}},
+    "sentence": {{sentence}},
+    "lang_native": {{lang_native}},
+    "lang_target": {{lang_target}}
+  },
+  "output": {
+    "chunks": [ { "text": "string", "meaning": "string", "explanation": "string" } ]
+  }
+}`,
+    html: `<div class="ck-row" data-each="chunks" data-check>
+  <b class="c">{{text}}</b>
+  <span class="m">{{meaning}}</span>
+  <div class="x">{{explanation}}</div>
+</div>`,
+    css: `.ck-row b.c { color: #f2b02e; }
+.ck-row .m { margin-left: 8px; }
+.ck-row .x { font-size: 11px; color: #a5a5ad; }`,
+    sample: { word: 'dive', sentence: 'Darling, just dive right in', lang_target: 'English', lang_native: 'Vietnamese', lang_answer: 'Vietnamese' },
+    resp: { chunks: [
+      { text: 'Darling,', meaning: 'em yêu,', explanation: 'từ gọi thân mật' },
+      { text: 'just dive right in', meaning: 'cứ lao vào (làm) ngay', explanation: 'cụm động từ khuyến khích' },
+    ] },
+  },
+  sentenceTranslate: {
+    json: `{
+  "instructions": "You are a language translation API. Translate input.text into input.lang_native. MAINTAIN the EXACT punctuation.",
+  "input": {
+    "text": {{sentence}},
+    "lang_native": {{lang_native}}
+  },
+  "output": { "translation": "string" }
+}`,
+    html: `<div class="t" data-check>{{translation}}</div>
+<div class="s">{{sentence}}</div>`,
+    css: `.t { font-size: 14.5px; font-weight: 600; }
+.s { margin-top: 4px; font-size: 12px; color: #a5a5ad; }`,
+    sample: { word: 'dive', sentence: 'Darling, just dive right in', lang_target: 'English', lang_native: 'Vietnamese', lang_answer: 'Vietnamese' },
+    resp: { translation: 'Em yêu, cứ lao vào đi' },
+  },
+};
+const ORDER = ['wordExplain', 'sentenceBreakdown', 'sentenceTranslate'];
+const ED_TABS = ['JSON', 'HTML', 'CSS'];
+
+const state = { feature: 'wordExplain', tab: 'JSON', docs: {}, dirty: {} };
+for (const f of ORDER) {
+  const d = DEFAULTS[f];
+  state.docs[f] = { JSON: d.json, HTML: d.html, CSS: d.css };
+  state.dirty[f] = false;
+}
+
+// ================= template engine =================
+const SLOT_RE = /\{\{\s*([a-zA-Z_]\w*)\s*\}\}/g;
+const fillSlots = (str, vars, jsonMode) =>
+  str.replace(SLOT_RE, (m, name) => {
+    if (!(name in vars)) return jsonMode ? 'null' : '';
+    return jsonMode ? JSON.stringify(vars[name]) : String(vars[name]);
+  });
+
+function deriveSpec(output) {
+  if (output == null || typeof output !== 'object' || Array.isArray(output))
+    return { err: T().errOutObj };
+  const arrKey = Object.keys(output).find((k) => Array.isArray(output[k]));
+  if (arrKey) {
+    const item = output[arrKey][0];
+    const fields = item && typeof item === 'object' ? Object.keys(item) : [];
+    for (const f of ['text', 'meaning', 'explanation'])
+      if (!fields.includes(f)) return { err: T().errField(arrKey, f) };
+    return { kind: 'chunks', key: arrKey };
+  }
+  const leaves = [];
+  (function walk(node, path) {
+    if (node === 'string') leaves.push(path);
+    else if (node && typeof node === 'object' && !Array.isArray(node))
+      for (const k of Object.keys(node)) walk(node[k], path ? `${path}.${k}` : k);
+  })(output, '');
+  if (leaves.length === 0) return { err: T().errNoLeaf };
+  if (leaves.length > 1) return { err: T().errManyLeaf(leaves.length, leaves.join(', ')) };
+  return { kind: 'text', path: leaves[0] };
+}
+const getPath = (o, p) => p.split('.').reduce((x, k) => (x == null ? x : x[k]), o);
+const firstString = (o) => {
+  if (typeof o === 'string') return o;
+  if (o && typeof o === 'object')
+    for (const k of Object.keys(o)) { const v = firstString(o[k]); if (v != null) return v; }
+  return null;
+};
+const firstArray = (o) => {
+  if (Array.isArray(o)) return o;
+  if (o && typeof o === 'object')
+    for (const k of Object.keys(o)) { const v = firstArray(o[k]); if (v) return v; }
+  return null;
+};
+
+function sanitize(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script\s*>/gi, '')
+    .replace(/<script[^>]*>/gi, '')
+    .replace(/<(iframe|form|input|button|select|textarea)[^>]*>[\s\S]*?<\/\1\s*>/gi, '')
+    .replace(/<(iframe|input|br|img)[^>]*>/gi, (m, tag) => (tag === 'br' || tag === 'img' ? m : ''))
+    .replace(/\son\w+\s*=\s*"[^"]*"/gi, '')
+    .replace(/\son\w+\s*=\s*'[^']*'/gi, '')
+    .replace(/\son\w+\s*=\s*[^\s>]+/gi, '')
+    .replace(/javascript\s*:/gi, '');
+}
+
+function renderDisplay(html, vars, arrays) {
+  const tpl = document.createElement('template');
+  tpl.innerHTML = sanitize(html);
+  tpl.content.querySelectorAll('[data-each]').forEach((node) => {
+    const key = node.getAttribute('data-each');
+    const items = arrays[key] || [];
+    const frag = document.createDocumentFragment();
+    items.forEach((item) => {
+      const clone = node.cloneNode(true);
+      clone.removeAttribute('data-each');
+      clone.innerHTML = fillSlots(clone.innerHTML, item, false);
+      frag.appendChild(clone);
+    });
+    node.replaceWith(frag);
+  });
+  const holder = document.createElement('div');
+  holder.appendChild(tpl.content);
+  holder.innerHTML = fillSlots(holder.innerHTML, vars, false);
+  holder.querySelectorAll('[data-check]').forEach((node) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'ck';
+    wrap.innerHTML = '<span class="box">✓</span>';
+    const body = document.createElement('div');
+    body.className = 'ckBody';
+    node.replaceWith(wrap);
+    body.appendChild(node);
+    wrap.appendChild(body);
+    wrap.addEventListener('click', () => { wrap.classList.toggle('on'); updateFoot(); });
+  });
+  return holder;
+}
+
+// ================= pipeline =================
+const cur = () => DEFAULTS[state.feature];
+
+function analyze() {
+  const f = cur();
+  const doc = state.docs[state.feature];
+  let requestFilled, parsed, spec;
+  try {
+    requestFilled = fillSlots(doc.JSON, f.sample, true);
+    parsed = JSON.parse(requestFilled);
+  } catch (e) {
+    return { jsonErr: T().errJson(String(e.message).slice(0, 120)), requestFilled };
+  }
+  spec = deriveSpec(parsed.output);
+  if (spec.err) return { requestFilled, specErr: spec.err, spec };
+  let data = {}, arrays = {};
+  if (spec.kind === 'chunks') {
+    arrays[spec.key] = f.resp[spec.key] || firstArray(f.resp) || [];
+  } else {
+    data[spec.path.split('.').pop()] = getPath(f.resp, spec.path) ?? firstString(f.resp) ?? '';
+  }
+  return { requestFilled, spec, data, arrays };
+}
+
+function updateFoot() {
+  const n = document.querySelectorAll('#preview .ck.on').length;
+  const total = document.querySelectorAll('#preview .ck').length;
+  el('popFoot').innerHTML = total ? T().footCheck(n, total) : T().footNone;
+}
+
+function render() {
+  const f = cur();
+  const res = analyze();
+  const status = el('edStatus');
+  const slots = el('slots');
+  const preview = el('preview');
+
+  if (res.jsonErr) {
+    status.className = 'edStatus err';
+    status.textContent = res.jsonErr;
+    el('payloadBody').textContent = res.requestFilled || '';
+  } else {
+    el('payloadBody').textContent = res.requestFilled;
+    if (res.specErr) {
+      status.className = 'edStatus err';
+      status.textContent = res.specErr;
+    } else if (res.spec.kind === 'chunks') {
+      status.className = 'edStatus ok';
+      status.textContent = T().parseChunks(res.spec.key, res.arrays[res.spec.key].length);
+    } else {
+      status.className = 'edStatus ok';
+      status.textContent = T().parseText(res.spec.path, res.data[res.spec.path.split('.').pop()]);
+    }
+  }
+
+  const outKeys = res.spec && !res.specErr
+    ? (res.spec.kind === 'chunks' ? ['text', 'meaning', 'explanation'] : [res.spec.path.split('.').pop()])
+    : [];
+  slots.innerHTML = T().slotLabel +
+    SYSVARS.map((v) => `<code>{{${v}}}</code>`).join(' ') +
+    (outKeys.length ? ' + ' + outKeys.map((v) => `<code>{{${v}}}</code>`).join(' ') : '');
+
+  preview.innerHTML = '';
+  if (!res.jsonErr && !res.specErr) {
+    const vars = { ...f.sample, ...res.data };
+    try {
+      preview.appendChild(renderDisplay(state.docs[state.feature].HTML, vars, res.arrays));
+      const style = document.createElement('style');
+      style.textContent = state.docs[state.feature].CSS;
+      preview.appendChild(style);
+    } catch (e) {
+      preview.innerHTML = `<div style="color:var(--err);font-size:12px">${T().prevErr}${e.message}</div>`;
+    }
+  } else {
+    preview.innerHTML = `<div style="color:var(--text-3);font-size:12px">${T().prevWait}</div>`;
+  }
+  updateFoot();
+
+  document.querySelectorAll('.featTab').forEach((b, i) => {
+    const key = ORDER[i];
+    b.classList.toggle('on', key === state.feature);
+    b.querySelector('.dot').style.visibility = state.dirty[key] ? 'visible' : 'hidden';
+  });
+}
+
+// ================= chrome =================
+function syncEditor() { el('ed').value = state.docs[state.feature][state.tab]; }
+
+function buildChrome() {
+  el('featTabs').innerHTML = '';
+  ORDER.forEach((key) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'featTab';
+    b.innerHTML = T().features[key] + '<span class="dot">●</span>';
+    b.onclick = () => { state.feature = key; syncEditor(); render(); };
+    el('featTabs').appendChild(b);
+  });
+  el('edTabs').innerHTML = '';
+  ED_TABS.forEach((tb) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'edTab' + (tb === state.tab ? ' on' : '');
+    b.textContent = tb;
+    b.onclick = () => { state.tab = tb; syncEditor(); buildTabs(); };
+    el('edTabs').appendChild(b);
+  });
+}
+function buildTabs() {
+  document.querySelectorAll('.edTab').forEach((b, i) => b.classList.toggle('on', ED_TABS[i] === state.tab));
+}
+
+el('ed').addEventListener('input', () => {
+  state.docs[state.feature][state.tab] = el('ed').value;
+  state.dirty[state.feature] = true;
+  render();
+});
+el('btnReset').onclick = () => {
+  const d = DEFAULTS[state.feature];
+  state.docs[state.feature] = { JSON: d.json, HTML: d.html, CSS: d.css };
+  state.dirty[state.feature] = false;
+  syncEditor(); render();
+};
+el('copyBtn').onclick = async () => {
+  await navigator.clipboard.writeText(META_PROMPT).catch(() => {});
+  el('copyBtn').textContent = T().copied;
+  el('copyBtn').classList.add('done');
+  setTimeout(() => { el('copyBtn').textContent = T().copy; el('copyBtn').classList.remove('done'); }, 1600);
+};
+
+// ================= static content render =================
+function renderStatic() {
+  const t = T();
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach((n) => { n.textContent = t[n.dataset.i18n] || ''; });
+  document.querySelectorAll('[data-i18n-html]').forEach((n) => { n.innerHTML = t[n.dataset.i18nHtml] || ''; });
+  el('steps').innerHTML = t.steps.map(([h, p]) =>
+    `<div class="step"><h3>${h}</h3><p>${p}</p></div>`).join('');
+  el('contract').innerHTML = t.contract.map(([c, p]) =>
+    `<div class="ct"><code>${c}</code><p>${p}</p></div>`).join('');
+  el('varRows').innerHTML =
+    `<div class="vrow"><b style="font-size:13.5px">${t.varsTitle}</b></div>` +
+    t.vars.map(([c, d]) => `<div class="vrow"><code>${c}</code><span>${d}</span></div>`).join('');
+  el('aiSteps').innerHTML = t.aiSteps.map((s) => `<li>${s}</li>`).join('');
+  el('metaPrompt').textContent = META_PROMPT;
+  el('copyBtn').textContent = t.copy;
+  el('langEn').classList.toggle('on', lang === 'en');
+  el('langVi').classList.toggle('on', lang === 'vi');
+  buildChrome();
+}
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('tihoka-guide-lang', l);
+  renderStatic();
+  render();
+}
+el('langEn').onclick = () => setLang('en');
+el('langVi').onclick = () => setLang('vi');
+
+renderStatic();
+syncEditor();
+render();
+</script>
+</body>
+</html>

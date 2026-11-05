@@ -4,33 +4,324 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="google-site-verification" content="zHaHttvMVJD1NYsehb7YUk3EEZTqedvzD6alOHeSmow" />
+<meta name="description" content="Tihoka — a Chrome extension that turns streaming video into a language-learning session. Subtitles, tap-to-translate dictionary, Anki export, and AI answers you fully customize.">
 <title>Tihoka — Learn languages from the videos you already watch</title>
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 48px auto; padding: 0 20px; line-height: 1.6; color: #1a1a1a; }
-  h1 { font-size: 2rem; margin-bottom: 0.25rem; }
-  .tag { color: #555; font-size: 1.1rem; margin-top: 0; }
-  h2 { font-size: 1.15rem; margin-top: 2rem; }
-  ul { padding-left: 1.25rem; }
-  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #ddd; font-size: 0.9rem; color: #666; }
+  :root {
+    --bg: #141416;
+    --bg-raised: #1d1d21;
+    --card: #232327;
+    --field: #2b2b30;
+    --text: #ececef;
+    --text-2: #a8a8b0;
+    --text-3: #74747d;
+    --gold: #f2b02e;
+    --gold-2: #e09a12;
+    --gold-soft: rgba(242, 176, 46, 0.12);
+    --divider: #333338;
+    --mono: "Cascadia Code", Consolas, "Courier New", monospace;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--gold); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---- nav ---- */
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(20, 20, 22, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--divider);
+  }
+  .nav-in { display: flex; align-items: center; gap: 20px; height: 60px; }
+  .logo { font-weight: 700; font-size: 18px; letter-spacing: 0.02em; color: var(--text); }
+  .logo:hover { text-decoration: none; }
+  .logo em { color: var(--gold); font-style: normal; }
+  .nav-links { margin-left: auto; display: flex; gap: 6px; }
+  .nav-links a {
+    padding: 7px 14px; border-radius: 999px;
+    color: var(--text-2); font-size: 14px;
+  }
+  .nav-links a:hover { color: var(--text); background: var(--field); text-decoration: none; }
+  .nav-links a.cta { color: #20180a; background: var(--gold); font-weight: 600; }
+  .nav-links a.cta:hover { background: var(--gold-2); }
+
+  /* ---- hero ---- */
+  .hero { padding: 96px 0 72px; text-align: center; }
+  .hero .kicker {
+    display: inline-block; padding: 5px 14px; border-radius: 999px;
+    background: var(--gold-soft); color: var(--gold);
+    font-size: 13px; font-weight: 600; letter-spacing: 0.04em;
+  }
+  .hero h1 {
+    margin: 20px 0 16px;
+    font-size: clamp(34px, 5.4vw, 56px);
+    line-height: 1.12; letter-spacing: -0.02em;
+  }
+  .hero h1 em { color: var(--gold); font-style: normal; }
+  .hero p.sub {
+    max-width: 620px; margin: 0 auto 34px;
+    color: var(--text-2); font-size: 18px;
+  }
+  .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 26px; border-radius: 999px;
+    font-size: 15px; font-weight: 600;
+  }
+  .btn:hover { text-decoration: none; }
+  .btn-gold { background: var(--gold); color: #20180a; }
+  .btn-gold:hover { background: var(--gold-2); }
+  .btn-ghost { border: 1px solid var(--divider); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--gold); background: var(--field); }
+
+  /* ---- sections ---- */
+  section { padding: 72px 0; }
+  section + section { border-top: 1px solid var(--divider); }
+  .sec-head { max-width: 640px; margin-bottom: 44px; }
+  .sec-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+  .sec-head h2 { margin: 0 0 12px; font-size: 30px; letter-spacing: -0.01em; }
+  .sec-head p { margin: 0; color: var(--text-2); font-size: 16.5px; }
+
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .feat {
+    background: var(--card); border: 1px solid var(--divider);
+    border-radius: var(--radius); padding: 24px 22px;
+  }
+  .feat .ic {
+    width: 40px; height: 40px; margin-bottom: 14px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 11px; background: var(--gold-soft);
+    color: var(--gold); font-size: 19px;
+  }
+  .feat h3 { margin: 0 0 8px; font-size: 16.5px; }
+  .feat p { margin: 0; color: var(--text-2); font-size: 14.5px; }
+
+  /* ---- AI spotlight ---- */
+  .spot { display: grid; gap: 40px; align-items: center; }
+  @media (min-width: 900px) { .spot { grid-template-columns: 5fr 6fr; } }
+  .spot h2 { margin: 0 0 14px; font-size: 30px; letter-spacing: -0.01em; }
+  .spot p { color: var(--text-2); margin: 0 0 14px; }
+  .spot ul { margin: 0 0 24px; padding-left: 20px; color: var(--text-2); }
+  .spot li { margin-bottom: 6px; }
+  .spot code { font-family: var(--mono); font-size: 13px; color: var(--gold); }
+  .mock {
+    background: var(--card); border: 1px solid var(--divider);
+    border-radius: var(--radius); overflow: hidden;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+  }
+  .mock-bar {
+    display: flex; gap: 2px; padding: 10px 14px 0;
+    border-bottom: 1px solid var(--divider);
+  }
+  .mock-tab {
+    padding: 7px 16px; border-radius: 8px 8px 0 0;
+    color: var(--text-3); font-size: 12px; font-weight: 600;
+  }
+  .mock-tab.on { background: var(--field); color: var(--gold); }
+  .mock-body {
+    padding: 16px; background: var(--field);
+    font-family: var(--mono); font-size: 12px; line-height: 1.7;
+    color: var(--text-2); white-space: pre-wrap; word-break: break-word;
+    min-height: 150px;
+  }
+  .mock-body .k { color: #8fb8e8; }
+  .mock-body .v { color: #c8a15a; }
+  .mock-foot { padding: 10px 16px; font-size: 12px; color: var(--text-3); border-top: 1px solid var(--divider); }
+
+  /* ---- steps ---- */
+  .steps { counter-reset: s; max-width: 680px; margin: 0 auto; }
+  .step { position: relative; padding: 0 0 30px 58px; }
+  .step::before {
+    counter-increment: s; content: counter(s);
+    position: absolute; left: 0; top: 0;
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--field); color: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px;
+    border: 1px solid var(--divider);
+  }
+  .step:not(:last-child)::after {
+    content: ''; position: absolute; left: 18px; top: 42px; bottom: 4px;
+    width: 2px; background: var(--divider);
+  }
+  .step h3 { margin: 6px 0 6px; font-size: 16.5px; }
+  .step p { margin: 0; color: var(--text-2); font-size: 14.5px; }
+
+  /* ---- privacy band ---- */
+  .privacy {
+    display: grid; gap: 18px; align-items: center;
+    background: var(--bg-raised); border-radius: var(--radius);
+    padding: 34px 30px; border: 1px solid var(--divider);
+  }
+  @media (min-width: 760px) { .privacy { grid-template-columns: auto 1fr auto; } }
+  .privacy .ic { font-size: 30px; }
+  .privacy h3 { margin: 0 0 4px; font-size: 17px; }
+  .privacy p { margin: 0; color: var(--text-2); font-size: 14.5px; }
+
+  footer {
+    border-top: 1px solid var(--divider);
+    padding: 36px 0 48px;
+    color: var(--text-3); font-size: 14px;
+  }
+  .foot-in { display: flex; flex-wrap: wrap; gap: 12px 26px; align-items: center; }
+  .foot-in .spacer { margin-left: auto; }
 </style>
 </head>
 <body>
-<h1>Tihoka</h1>
-<p class="tag">A Chrome extension that turns streaming video into a language-learning session.</p>
 
-<h2>What it does</h2>
-<ul>
-  <li>Downloads and displays subtitles on supported streaming sites.</li>
-  <li>Tap-to-translate dictionary lookups while you watch.</li>
-  <li>Saves words into spaced-repetition decks and exports Anki cards.</li>
-  <li>Optionally syncs your decks and settings to your own Google Drive.</li>
-</ul>
+<nav>
+  <div class="wrap nav-in">
+    <a class="logo" href="./">Tihoka<em>.</em></a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="guide.html">AI Guide</a>
+      <a class="cta" href="guide.html">Customize your AI</a>
+    </div>
+  </div>
+</nav>
 
-<h2>Your data</h2>
-<p>All learning data stays on your device. Sync is opt-in and writes only to a hidden app-data folder in your Google Drive. See the <a href="privacy.html">Privacy Policy</a>.</p>
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker">Chrome Extension · Language Learning</span>
+    <h1>Turn the videos you watch<br>into <em>lessons you keep</em></h1>
+    <p class="sub">Tihoka reads subtitles on streaming sites, lets you look up any word in place, and sends what matters straight into your Anki decks — with AI answers you fully control.</p>
+    <div class="btn-row">
+      <a class="btn btn-gold" href="guide.html">See how AI customization works</a>
+      <a class="btn btn-ghost" href="#how">How it works</a>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head center">
+      <h2>Everything happens while you watch</h2>
+      <p>No switching apps, no pausing to search. The learning layer sits on top of the video.</p>
+    </div>
+    <div class="grid">
+      <div class="feat">
+        <span class="ic">⌄</span>
+        <h3>Subtitle display</h3>
+        <p>Downloads and shows subtitles on supported streaming sites, styled to stay readable on any scene.</p>
+      </div>
+      <div class="feat">
+        <span class="ic">❖</span>
+        <h3>Tap-to-translate</h3>
+        <p>Click a word in the subtitle — a dictionary popup gives the meaning, breakdown, and sentence translation in place.</p>
+      </div>
+      <div class="feat">
+        <span class="ic">✦</span>
+        <h3>AI answers, your rules</h3>
+        <p>ChatGPT, Gemini, DeepSeek or Claude answer inside the popup — and you can rewrite exactly what they're asked and how results look.</p>
+      </div>
+      <div class="feat">
+        <span class="ic">▣</span>
+        <h3>Anki export</h3>
+        <p>Tick the parts worth keeping and they go into flashcards — words, chunks, translations — ready for spaced repetition.</p>
+      </div>
+      <div class="feat">
+        <span class="ic">♻</span>
+        <h3>Decks &amp; sync</h3>
+        <p>Saved words live in spaced-repetition decks. Optional sync writes to a hidden app-data folder on your own Google Drive.</p>
+      </div>
+      <div class="feat">
+        <span class="ic">◍</span>
+        <h3>Private by default</h3>
+        <p>All learning data stays on your device. Sync is opt-in. No accounts, no analytics on what you learn.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ai">
+  <div class="wrap spot">
+    <div>
+      <h2>Your AI, your format</h2>
+      <p>Every AI answer in the popup is driven by a request template you own — one JSON document. Change the instructions, rename the output keys, and Tihoka parses by the schema <em>you</em> declared.</p>
+      <ul>
+        <li>One JSON per feature — request and answer contract in a single document.</li>
+        <li><code>output</code> is the parse spec: pick your own key names, the reader follows.</li>
+        <li>HTML + CSS templates control how every answer looks.</li>
+        <li><code>data-check</code> marks what can go into your Anki cards.</li>
+      </ul>
+      <a class="btn btn-gold" href="guide.html">Open the step-by-step guide</a>
+    </div>
+    <div class="mock">
+      <div class="mock-bar">
+        <span class="mock-tab on">JSON</span><span class="mock-tab">HTML</span><span class="mock-tab">CSS</span>
+      </div>
+      <div class="mock-body">{
+  <span class="k">"instructions"</span>: <span class="v">"Translate input.text into input.lang_native."</span>,
+  <span class="k">"input"</span>: { <span class="k">"text"</span>: <span class="v">{{sentence}}</span>, <span class="k">"lang_native"</span>: <span class="v">{{lang_native}}</span> },
+  <span class="k">"output"</span>: { <span class="k">"ket_qua"</span>: <span class="v">"string"</span> }
+}</div>
+      <div class="mock-foot">Rename <b style="color:var(--gold)">ket_qua</b> to anything — the parser follows your schema.</div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head center">
+      <h2>From watching to remembering</h2>
+      <p>The loop takes seconds per word — the review compound does the rest.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <h3>Watch with Tihoka subtitles</h3>
+        <p>Open a supported streaming site. Tihoka overlays readable subtitles and tracks the sentence you're on.</p>
+      </div>
+      <div class="step">
+        <h3>Click any word you don't know</h3>
+        <p>The dictionary popup shows dictionary entries plus AI answers — explanation, sentence breakdown, translation — from the provider you picked.</p>
+      </div>
+      <div class="step">
+        <h3>Tick what goes into your deck</h3>
+        <p>Checkboxed answers feed straight into cards. Nothing enters your deck that you didn't tick.</p>
+      </div>
+      <div class="step">
+        <h3>Review in Anki</h3>
+        <p>Export to Anki or review in built-in decks. Optional Google Drive sync keeps everything backed up under your account.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="privacy">
+      <span class="ic">◍</span>
+      <div>
+        <h3>Your data stays yours</h3>
+        <p>All learning data lives on your device. Sync is opt-in and writes only to a hidden app-data folder in your Google Drive.</p>
+      </div>
+      <a class="btn btn-ghost" href="privacy.html">Privacy Policy</a>
+    </div>
+  </div>
+</section>
 
 <footer>
-  Contact: <a href="mailto:tihoka.official@gmail.com">tihoka.official@gmail.com</a>
+  <div class="wrap foot-in">
+    <span>© Tihoka</span>
+    <a href="mailto:tihoka.official@gmail.com">tihoka.official@gmail.com</a>
+    <span class="spacer"></span>
+    <a href="guide.html">AI customization guide</a>
+    <a href="privacy.html">Privacy</a>
+  </div>
 </footer>
+
 </body>
 </html>
