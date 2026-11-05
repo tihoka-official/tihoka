@@ -36,7 +36,7 @@
   a { color: var(--gold); text-decoration: none; }
   a:hover { text-decoration: underline; }
 
-  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
 
   /* ---- nav ---- */
   nav {
@@ -59,7 +59,7 @@
   .nav-links a.cta:hover { background: var(--gold-2); }
 
   /* ---- hero ---- */
-  .hero { padding: 96px 0 72px; text-align: center; }
+  .hero { padding: 88px 0 64px; text-align: center; }
   .hero .kicker {
     display: inline-block; padding: 5px 14px; border-radius: 999px;
     background: var(--gold-soft); color: var(--gold);
@@ -87,59 +87,88 @@
   .btn-ghost { border: 1px solid var(--divider); color: var(--text); }
   .btn-ghost:hover { border-color: var(--gold); background: var(--field); }
 
+  /* ---- browser-frame screenshot placeholder ----
+     Swap: replace the whole .ph block with
+       <img class="shot" src="shots/<name>.png" alt="...">
+     Keep the .frame wrapper — it gives the browser chrome. */
+  .frame {
+    border: 1px solid var(--divider); border-radius: var(--radius);
+    background: var(--card); overflow: hidden;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+  }
+  .frame-bar {
+    display: flex; align-items: center; gap: 6px;
+    padding: 10px 14px; border-bottom: 1px solid var(--divider);
+  }
+  .frame-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--field); }
+  .frame-url {
+    margin-left: 10px; flex: 1; padding: 5px 12px; border-radius: 999px;
+    background: var(--field); color: var(--text-3);
+    font-size: 12px; font-family: var(--mono);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ph {
+    aspect-ratio: 16 / 10;
+    display: flex; flex-direction: column; gap: 10px;
+    align-items: center; justify-content: center;
+    background:
+      repeating-linear-gradient(45deg, transparent 0 18px, rgba(255,255,255,.018) 18px 36px),
+      var(--bg-raised);
+    color: var(--text-3);
+    border: 0; padding: 24px; text-align: center;
+  }
+  .ph .ph-ic {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--gold-soft); color: var(--gold); font-size: 21px;
+  }
+  .ph b { color: var(--text-2); font-weight: 600; font-size: 14px; }
+  .ph span { font-size: 12.5px; max-width: 340px; }
+  img.shot { display: block; width: 100%; height: auto; }
+
   /* ---- sections ---- */
   section { padding: 72px 0; }
   section + section { border-top: 1px solid var(--divider); }
-  .sec-head { max-width: 640px; margin-bottom: 44px; }
+  .sec-head { max-width: 640px; margin-bottom: 48px; }
   .sec-head.center { margin-left: auto; margin-right: auto; text-align: center; }
   .sec-head h2 { margin: 0 0 12px; font-size: 30px; letter-spacing: -0.01em; }
   .sec-head p { margin: 0; color: var(--text-2); font-size: 16.5px; }
 
-  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
-  .feat {
-    background: var(--card); border: 1px solid var(--divider);
-    border-radius: var(--radius); padding: 24px 22px;
+  /* ---- showcase rows ---- */
+  .show { display: grid; gap: 44px; align-items: center; margin-bottom: 88px; }
+  .show:last-child { margin-bottom: 0; }
+  @media (min-width: 880px) {
+    .show { grid-template-columns: 6fr 5fr; }
+    .show.flip .show-media { order: 2; }
   }
-  .feat .ic {
-    width: 40px; height: 40px; margin-bottom: 14px;
-    display: inline-flex; align-items: center; justify-content: center;
-    border-radius: 11px; background: var(--gold-soft);
-    color: var(--gold); font-size: 19px;
+  .show-txt .tag {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    background: var(--gold-soft); color: var(--gold);
+    font-size: 12.5px; font-weight: 600; letter-spacing: .03em;
+    margin-bottom: 14px;
   }
-  .feat h3 { margin: 0 0 8px; font-size: 16.5px; }
-  .feat p { margin: 0; color: var(--text-2); font-size: 14.5px; }
+  .show-txt h3 { margin: 0 0 12px; font-size: 26px; letter-spacing: -0.01em; }
+  .show-txt p { margin: 0 0 14px; color: var(--text-2); }
+  .show-txt ul { margin: 0; padding-left: 20px; color: var(--text-2); }
+  .show-txt li { margin-bottom: 6px; }
+  .show-txt code { font-family: var(--mono); font-size: 13px; color: var(--gold); }
+  .show-txt .btn { margin-top: 22px; }
 
-  /* ---- AI spotlight ---- */
-  .spot { display: grid; gap: 40px; align-items: center; }
-  @media (min-width: 900px) { .spot { grid-template-columns: 5fr 6fr; } }
-  .spot h2 { margin: 0 0 14px; font-size: 30px; letter-spacing: -0.01em; }
-  .spot p { color: var(--text-2); margin: 0 0 14px; }
-  .spot ul { margin: 0 0 24px; padding-left: 20px; color: var(--text-2); }
-  .spot li { margin-bottom: 6px; }
-  .spot code { font-family: var(--mono); font-size: 13px; color: var(--gold); }
-  .mock {
-    background: var(--card); border: 1px solid var(--divider);
-    border-radius: var(--radius); overflow: hidden;
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+  /* inside-frame mini mock for the AI row */
+  .mock-body {
+    padding: 16px; background: var(--field);
+    font-family: var(--mono); font-size: 12px; line-height: 1.7;
+    color: var(--text-2); white-space: pre-wrap; word-break: break-word;
   }
-  .mock-bar {
-    display: flex; gap: 2px; padding: 10px 14px 0;
-    border-bottom: 1px solid var(--divider);
-  }
+  .mock-body .k { color: #8fb8e8; }
+  .mock-body .v { color: #c8a15a; }
+  .mock-foot { padding: 10px 16px; font-size: 12px; color: var(--text-3); border-top: 1px solid var(--divider); }
+  .mock-tabs { display: flex; gap: 2px; padding: 10px 14px 0; background: var(--card); }
   .mock-tab {
     padding: 7px 16px; border-radius: 8px 8px 0 0;
     color: var(--text-3); font-size: 12px; font-weight: 600;
   }
   .mock-tab.on { background: var(--field); color: var(--gold); }
-  .mock-body {
-    padding: 16px; background: var(--field);
-    font-family: var(--mono); font-size: 12px; line-height: 1.7;
-    color: var(--text-2); white-space: pre-wrap; word-break: break-word;
-    min-height: 150px;
-  }
-  .mock-body .k { color: #8fb8e8; }
-  .mock-body .v { color: #c8a15a; }
-  .mock-foot { padding: 10px 16px; font-size: 12px; color: var(--text-3); border-top: 1px solid var(--divider); }
 
   /* ---- steps ---- */
   .steps { counter-reset: s; max-width: 680px; margin: 0 auto; }
@@ -200,7 +229,7 @@
     <p class="sub">Tihoka reads subtitles on streaming sites, lets you look up any word in place, and sends what matters straight into your Anki decks — with AI answers you fully control.</p>
     <div class="btn-row">
       <a class="btn btn-gold" href="guide.html">See how AI customization works</a>
-      <a class="btn btn-ghost" href="#how">How it works</a>
+      <a class="btn btn-ghost" href="#features">See it in action</a>
     </div>
   </div>
 </header>
@@ -211,64 +240,106 @@
       <h2>Everything happens while you watch</h2>
       <p>No switching apps, no pausing to search. The learning layer sits on top of the video.</p>
     </div>
-    <div class="grid">
-      <div class="feat">
-        <span class="ic">⌄</span>
-        <h3>Subtitle display</h3>
-        <p>Downloads and shows subtitles on supported streaming sites, styled to stay readable on any scene.</p>
-      </div>
-      <div class="feat">
-        <span class="ic">❖</span>
-        <h3>Tap-to-translate</h3>
-        <p>Click a word in the subtitle — a dictionary popup gives the meaning, breakdown, and sentence translation in place.</p>
-      </div>
-      <div class="feat">
-        <span class="ic">✦</span>
-        <h3>AI answers, your rules</h3>
-        <p>ChatGPT, Gemini, DeepSeek or Claude answer inside the popup — and you can rewrite exactly what they're asked and how results look.</p>
-      </div>
-      <div class="feat">
-        <span class="ic">▣</span>
-        <h3>Anki export</h3>
-        <p>Tick the parts worth keeping and they go into flashcards — words, chunks, translations — ready for spaced repetition.</p>
-      </div>
-      <div class="feat">
-        <span class="ic">♻</span>
-        <h3>Decks &amp; sync</h3>
-        <p>Saved words live in spaced-repetition decks. Optional sync writes to a hidden app-data folder on your own Google Drive.</p>
-      </div>
-      <div class="feat">
-        <span class="ic">◍</span>
-        <h3>Private by default</h3>
-        <p>All learning data stays on your device. Sync is opt-in. No accounts, no analytics on what you learn.</p>
-      </div>
-    </div>
-  </div>
-</section>
 
-<section id="ai">
-  <div class="wrap spot">
-    <div>
-      <h2>Your AI, your format</h2>
-      <p>Every AI answer in the popup is driven by a request template you own — one JSON document. Change the instructions, rename the output keys, and Tihoka parses by the schema <em>you</em> declared.</p>
-      <ul>
-        <li>One JSON per feature — request and answer contract in a single document.</li>
-        <li><code>output</code> is the parse spec: pick your own key names, the reader follows.</li>
-        <li>HTML + CSS templates control how every answer looks.</li>
-        <li><code>data-check</code> marks what can go into your Anki cards.</li>
-      </ul>
-      <a class="btn btn-gold" href="guide.html">Open the step-by-step guide</a>
-    </div>
-    <div class="mock">
-      <div class="mock-bar">
-        <span class="mock-tab on">JSON</span><span class="mock-tab">HTML</span><span class="mock-tab">CSS</span>
+    <!-- Subtitles -->
+    <div class="show">
+      <div class="show-media frame">
+        <div class="frame-bar">
+          <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
+          <span class="frame-url">netflix.com/watch/…</span>
+        </div>
+        <!-- swap: <img class="shot" src="shots/subtitles.png" alt="Tihoka subtitles over a streaming video"> -->
+        <div class="ph">
+          <span class="ph-ic">⌄</span>
+          <b>Screenshot: subtitles overlay</b>
+          <span>Video frame with Tihoka's readable subtitle line at the bottom</span>
+        </div>
       </div>
-      <div class="mock-body">{
+      <div class="show-txt">
+        <span class="tag">Watch</span>
+        <h3>Subtitles that stay readable on any scene</h3>
+        <p>Tihoka pulls subtitles from supported streaming sites and restyles them — crisp contrast, clean typography, positioned so they never fight the picture.</p>
+        <ul>
+          <li>Follows the dialogue in real time, sentence by sentence.</li>
+          <li>Styled for legibility — no more squinting at baked-in captions.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Dictionary popup -->
+    <div class="show flip">
+      <div class="show-media frame">
+        <div class="frame-bar">
+          <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
+          <span class="frame-url">dictionary popup</span>
+        </div>
+        <!-- swap: <img class="shot" src="shots/popup.png" alt="Dictionary popup over a clicked word"> -->
+        <div class="ph">
+          <span class="ph-ic">❖</span>
+          <b>Screenshot: dictionary popup</b>
+          <span>The popup opened on a clicked word — meanings, breakdown, translate tabs</span>
+        </div>
+      </div>
+      <div class="show-txt">
+        <span class="tag">Look up</span>
+        <h3>Click a word — the answer appears in place</h3>
+        <p>No new tab, no lost context. The dictionary popup opens right on the subtitle with definitions, sentence breakdown and translation — from dictionaries and from AI providers you pick.</p>
+        <ul>
+          <li>Word meaning, sentence breakdown, and translation in one popup.</li>
+          <li>Powered by ChatGPT, Gemini, DeepSeek, or Claude — your choice per tab.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- AI customization -->
+    <div class="show">
+      <div class="show-media frame">
+        <div class="mock-tabs">
+          <span class="mock-tab on">JSON</span><span class="mock-tab">HTML</span><span class="mock-tab">CSS</span>
+        </div>
+        <div class="mock-body">{
   <span class="k">"instructions"</span>: <span class="v">"Translate input.text into input.lang_native."</span>,
   <span class="k">"input"</span>: { <span class="k">"text"</span>: <span class="v">{{sentence}}</span>, <span class="k">"lang_native"</span>: <span class="v">{{lang_native}}</span> },
   <span class="k">"output"</span>: { <span class="k">"ket_qua"</span>: <span class="v">"string"</span> }
 }</div>
-      <div class="mock-foot">Rename <b style="color:var(--gold)">ket_qua</b> to anything — the parser follows your schema.</div>
+        <div class="mock-foot">Rename <b style="color:var(--gold)">ket_qua</b> to anything — the parser follows your schema.</div>
+      </div>
+      <div class="show-txt">
+        <span class="tag">Customize</span>
+        <h3>AI answers, on your terms</h3>
+        <p>Every AI answer runs on a request template you own — one JSON document holding the rules, the data, and the answer schema. Plus HTML &amp; CSS templates for how results look.</p>
+        <ul>
+          <li>Rename output keys freely — the reader parses by <em>your</em> schema.</li>
+          <li>Layout answers with <code>{{slots}}</code>, <code>data-each</code> loops and <code>data-check</code> checkboxes.</li>
+          <li>Validate before saving — broken templates can't ship.</li>
+        </ul>
+        <a class="btn btn-gold" href="guide.html">Open the interactive guide</a>
+      </div>
+    </div>
+
+    <!-- Anki -->
+    <div class="show flip">
+      <div class="show-media frame">
+        <div class="frame-bar">
+          <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
+          <span class="frame-url">anki / decks</span>
+        </div>
+        <!-- swap: <img class="shot" src="shots/anki.png" alt="Checked answers becoming Anki flashcards"> -->
+        <div class="ph">
+          <span class="ph-ic">▣</span>
+          <b>Screenshot: cards &amp; decks</b>
+          <span>Checked answers flowing into a deck, or the Anki card they become</span>
+        </div>
+      </div>
+      <div class="show-txt">
+        <span class="tag">Remember</span>
+        <h3>Tick what matters — it becomes a flashcard</h3>
+        <p>Answers arrive with checkboxes. Tick the chunk, word, or translation worth keeping and it goes into your deck — nothing enters that you didn't choose.</p>
+        <ul>
+          <li>Spaced-repetition decks inside Tihoka, or export to Anki.</li>
+          <li>Optional Google Drive sync — to a hidden folder on your own account.</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
