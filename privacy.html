@@ -3,49 +3,211 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Tihoka Privacy Policy — your learning data stays on your device; optional sync writes to your own Google Drive.">
 <title>Tihoka — Privacy Policy</title>
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 48px auto; padding: 0 20px; line-height: 1.6; color: #1a1a1a; }
-  h1 { font-size: 1.6rem; }
-  h2 { font-size: 1.1rem; margin-top: 1.75rem; }
-  ul { padding-left: 1.25rem; }
-  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #ddd; font-size: 0.9rem; color: #666; }
+  :root {
+    --bg: #141416;
+    --bg-raised: #1d1d21;
+    --card: #232327;
+    --field: #2b2b30;
+    --text: #ececef;
+    --text-2: #a8a8b0;
+    --text-3: #74747d;
+    --gold: #f2b02e;
+    --gold-2: #e09a12;
+    --gold-soft: rgba(242, 176, 46, 0.12);
+    --ok: #8fce6f;
+    --divider: #333338;
+    --mono: "Cascadia Code", Consolas, "Courier New", monospace;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--gold); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: var(--mono); font-size: 0.86em; color: var(--gold);
+    background: var(--field); padding: 1px 6px; border-radius: 5px;
+  }
+
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(20, 20, 22, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--divider);
+  }
+  .nav-in { display: flex; align-items: center; gap: 20px; height: 60px; }
+  .logo { font-weight: 700; font-size: 18px; letter-spacing: 0.02em; color: var(--text); }
+  .logo:hover { text-decoration: none; }
+  .logo em { color: var(--gold); font-style: normal; }
+  .nav-links { margin-left: auto; display: flex; gap: 6px; }
+  .nav-links a {
+    padding: 7px 14px; border-radius: 999px;
+    color: var(--text-2); font-size: 14px;
+  }
+  .nav-links a:hover { color: var(--text); background: var(--field); text-decoration: none; }
+  .nav-links a.on { color: var(--gold); }
+
+  /* ---- doc header ---- */
+  .doc-head { padding: 64px 0 36px; border-bottom: 1px solid var(--divider); }
+  .doc-head .kicker {
+    display: inline-block; padding: 5px 14px; border-radius: 999px;
+    background: var(--gold-soft); color: var(--gold);
+    font-size: 13px; font-weight: 600; letter-spacing: 0.04em;
+  }
+  .doc-head h1 { margin: 16px 0 10px; font-size: clamp(30px, 4.5vw, 42px); letter-spacing: -0.02em; }
+  .doc-head .updated { margin: 0; color: var(--text-3); font-size: 14px; }
+
+  /* ---- doc body ---- */
+  .doc { padding: 8px 0 64px; }
+  .doc section { padding: 26px 0; }
+  .doc section + section { border-top: 1px solid var(--divider); }
+  .doc h2 {
+    display: flex; align-items: center; gap: 10px;
+    margin: 0 0 14px; font-size: 20px; letter-spacing: -0.01em;
+  }
+  .doc h2::before {
+    content: ''; width: 4px; height: 20px; border-radius: 2px;
+    background: var(--gold); flex: 0 0 auto;
+  }
+  .doc p { margin: 0 0 12px; color: var(--text-2); }
+  .doc ul { margin: 0; padding-left: 0; list-style: none; }
+  .doc li {
+    position: relative; padding: 4px 0 4px 22px;
+    color: var(--text-2);
+  }
+  .doc li::before {
+    content: ''; position: absolute; left: 2px; top: 14px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+  }
+  .doc strong { color: var(--text); }
+
+  /* summary callout */
+  .callout {
+    margin: 26px 0 0;
+    background: var(--gold-soft);
+    border: 1px solid rgba(242, 176, 46, 0.25);
+    border-radius: var(--radius);
+    padding: 24px 26px;
+  }
+  .callout .callout-tag {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--gold); font-weight: 700; font-size: 13px;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .callout p { margin: 0; color: var(--text); font-size: 16.5px; }
+
+  /* never-do card */
+  .never {
+    display: grid; gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    margin-top: 16px;
+  }
+  .never-item {
+    background: var(--card); border: 1px solid var(--divider);
+    border-radius: 12px; padding: 16px 18px;
+    display: flex; gap: 10px; align-items: flex-start;
+    color: var(--text-2); font-size: 14.5px;
+  }
+  .never-item::before {
+    content: '✕'; color: var(--ok); font-weight: 700; flex: 0 0 auto;
+  }
+
+  footer {
+    border-top: 1px solid var(--divider);
+    padding: 32px 0 44px;
+    color: var(--text-3); font-size: 14px;
+  }
+  .foot-in { display: flex; flex-wrap: wrap; gap: 12px 26px; align-items: center; }
+  .foot-in .spacer { margin-left: auto; }
 </style>
 </head>
 <body>
-<h1>Privacy Policy — Tihoka</h1>
-<p>Last updated: October 2026</p>
 
-<h2>Summary</h2>
-<p>Tihoka stores your learning data on your device. If you enable sync, your data is written to your own Google Drive. We do not operate a server, and we never receive your data.</p>
+<nav>
+  <div class="wrap nav-in">
+    <a class="logo" href="./">Tihoka<em>.</em></a>
+    <div class="nav-links">
+      <a href="./">Home</a>
+      <a href="guide.html">AI Guide</a>
+      <a class="on" href="privacy.html">Privacy</a>
+    </div>
+  </div>
+</nav>
 
-<h2>Data the extension stores</h2>
-<ul>
-  <li>Saved words, decks, review history, and settings.</li>
-  <li>Stored locally in your browser profile by default.</li>
-</ul>
+<header class="doc-head">
+  <div class="wrap">
+    <span class="kicker">Legal</span>
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: October 2026</p>
+  </div>
+</header>
 
-<h2>Google Drive sync (optional)</h2>
-<p>When you connect a Google account, Tihoka requests these OAuth scopes:</p>
-<ul>
-  <li><code>drive.appdata</code> — writes sync data to the hidden app-data folder in <strong>your</strong> Drive. Only Tihoka can see this folder.</li>
-  <li><code>drive.file</code> — reads and writes files that Tihoka itself created in your Drive.</li>
-  <li><code>openid</code>, <code>email</code> — identifies which account you connected.</li>
-</ul>
-<p>Sync traffic goes directly between your browser and Google's Drive API. No third party — including us — can read it.</p>
+<main class="doc">
+  <div class="wrap">
 
-<h2>What we never do</h2>
-<ul>
-  <li>No analytics, tracking, or advertising.</li>
-  <li>No collection, sale, or sharing of personal data.</li>
-  <li>No access to your Drive files that Tihoka did not create.</li>
-</ul>
+    <div class="callout">
+      <span class="callout-tag">◍ &nbsp;Summary</span>
+      <p>Tihoka stores your learning data on your device. If you enable sync, your data is written to your own Google Drive. We do not operate a server, and we never receive your data.</p>
+    </div>
 
-<h2>Disconnecting</h2>
-<p>You can disconnect your Google account in the extension settings at any time, or revoke access at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. Local and Drive data remain yours to keep or delete.</p>
+    <section>
+      <h2>Data the extension stores</h2>
+      <ul>
+        <li>Saved words, decks, review history, and settings.</li>
+        <li>Stored locally in your browser profile by default.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Google Drive sync (optional)</h2>
+      <p>When you connect a Google account, Tihoka requests these OAuth scopes:</p>
+      <ul>
+        <li><code>drive.appdata</code> — writes sync data to the hidden app-data folder in <strong>your</strong> Drive. Only Tihoka can see this folder.</li>
+        <li><code>drive.file</code> — reads and writes files that Tihoka itself created in your Drive.</li>
+        <li><code>openid</code>, <code>email</code> — identifies which account you connected.</li>
+      </ul>
+      <p>Sync traffic goes directly between your browser and Google's Drive API. No third party — including us — can read it.</p>
+    </section>
+
+    <section>
+      <h2>What we never do</h2>
+      <div class="never">
+        <div class="never-item">No analytics, tracking, or advertising.</div>
+        <div class="never-item">No collection, sale, or sharing of personal data.</div>
+        <div class="never-item">No access to your Drive files that Tihoka did not create.</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Disconnecting</h2>
+      <p>You can disconnect your Google account in the extension settings at any time, or revoke access at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. Local and Drive data remain yours to keep or delete.</p>
+    </section>
+
+  </div>
+</main>
 
 <footer>
-  Contact: <a href="mailto:tihoka.official@gmail.com">tihoka.official@gmail.com</a>
+  <div class="wrap foot-in">
+    <span>© Tihoka</span>
+    <a href="mailto:tihoka.official@gmail.com">tihoka.official@gmail.com</a>
+    <span class="spacer"></span>
+    <a href="./">Home</a>
+    <a href="guide.html">AI Guide</a>
+  </div>
 </footer>
+
 </body>
 </html>
